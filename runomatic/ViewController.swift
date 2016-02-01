@@ -22,24 +22,12 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         motionManager = CMMotionManager()
         motionManager.startAccelerometerUpdates()
-    //    var helloWorldTimer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getAccel"), userInfo: nil, repeats: true)
-
-        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
-        dispatch_async(dispatch_get_global_queue(priority, 0)) {
-        if let accelerometerData = motionManager.accelerometerData {
-            self.xa = accelerometerData.acceleration.x
-            self.ya = accelerometerData.acceleration.y
-            self.za = accelerometerData.acceleration.z
-            
-        }
-        dispatch_async(dispatch_get_main_queue()) {
-            self.xaccl.text = String(self.xa)
-            self.yaccl.text = String(self.ya)
-            self.zaccl.text = String(self.za)
-        }
-        }
+        var helloWorldTimer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getAccel"), userInfo: nil, repeats: true)
 
         time.text = "hi ben"
+        self.xaccl.text = "x"
+        self.yaccl.text = "y"
+        self.zaccl.text = "x"
     }
 
     override func didReceiveMemoryWarning() {
@@ -47,7 +35,23 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func getaccel(){
+    func getAccel(){
+        
+        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
+        dispatch_async(dispatch_get_global_queue(priority, 0)) {
+            if let accelerometerData = motionManager.accelerometerData {
+                self.xa = accelerometerData.acceleration.x
+                self.ya = accelerometerData.acceleration.y
+                self.za = accelerometerData.acceleration.z
+                
+            }
+            dispatch_async(dispatch_get_main_queue()) {
+                self.xaccl.text = String(self.xa)
+                self.yaccl.text = String(self.ya)
+                self.zaccl.text = String(self.za)
+            }
+        }
+
             }
 
 }
