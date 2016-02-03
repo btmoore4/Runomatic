@@ -14,6 +14,7 @@ var motionManager: CMMotionManager!
 
 class ViewController: UIViewController {
     let pi = M_PI
+    let accel_scale = 9.81
     @IBOutlet var time:UILabel!
     @IBOutlet var xal:UILabel!
     @IBOutlet var yal:UILabel!
@@ -39,7 +40,9 @@ class ViewController: UIViewController {
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
 
-        _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: Selector("readFromFile"), userInfo: nil, repeats: true)
+        
         startTime = NSDate()
         time.text = "hi ben"
         self.xal.text = "x"
@@ -57,9 +60,9 @@ class ViewController: UIViewController {
         let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
         dispatch_async(dispatch_get_global_queue(priority, 0)) {
             if let accelerometerData = motionManager.accelerometerData {
-                self.xa = accelerometerData.acceleration.x * 9.8
-                self.ya = accelerometerData.acceleration.y * 9.8
-                self.za = accelerometerData.acceleration.z * 9.8
+                self.xa = accelerometerData.acceleration.x * self.accel_scale
+                self.ya = accelerometerData.acceleration.y * self.accel_scale
+                self.za = accelerometerData.acceleration.z * self.accel_scale
                 self.elapsedTime = NSDate().timeIntervalSinceDate(self.startTime)
 
             }
@@ -90,11 +93,45 @@ class ViewController: UIViewController {
                 self.zml.text = String(format: "%.2f", self.zm)
 
                 self.time.text = String(self.elapsedTime)
-
+                self.writeToFile("X_accel.asc")
             }
         }
 
     }
+    
+    func writeToFile(file: String){
+        let text =  self.xal.text! + ", "
+        
+        if let dir : NSString = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true).first {
+            let path = dir.stringByAppendingPathComponent(file);
+            if let outputStream = NSOutputStream(toFileAtPath: path, append: true) {
+                outputStream.open()
+                outputStream.write(text, maxLength: text.characters.count)
+                outputStream.close()
+            } else {
+                print("Write to file failed")
+            }
+            
+        }
+            
+    }
+    
+    func readFromFile(){
+        let file = "X_accel.asc"
+        if let dir : NSString = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true).first {
+            let path = dir.stringByAppendingPathComponent(file);
+            
+            do {
+                let read = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding)
+                print(read)
+                print("Done")
+            }
+            catch {print("Read from file failed")}
+            
+        }
+        
+    }
+    
 
 }
 
