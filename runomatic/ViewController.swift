@@ -76,12 +76,15 @@ class ViewController: UIViewController {
                 
             }
             dispatch_async(dispatch_get_main_queue()) {
+                //update accelerometer labels
                 self.xal.text = String(format: "%.2f", self.xa)
                 self.yal.text = String(format: "%.2f", self.ya)
                 self.zal.text = String(format: "%.2f", self.za)
+                //update gyro labels
                 self.xrl.text = String(format: "%.2f", self.xr)
                 self.yrl.text = String(format: "%.2f", self.yr)
                 self.zrl.text = String(format: "%.2f", self.zr)
+                //update mag labels
                 self.xml.text = String(format: "%.2f", self.xm)
                 self.yml.text = String(format: "%.2f", self.ym)
                 self.zml.text = String(format: "%.2f", self.zm)
