@@ -9,12 +9,15 @@
 import UIKit
 import CoreMotion
 import Foundation
+import SocketIOClientSwift
 var motionManager: CMMotionManager!
 
 
 class ViewController: UIViewController {
     let pi = M_PI
     let accel_scale = 9.81
+    let socket = SocketIOClient(socketURL: NSURL(string: "http://192.168.0.113:3000")!, options: ["log": true])
+
     @IBOutlet var time:UILabel!
     @IBOutlet var xal:UILabel!
     @IBOutlet var yal:UILabel!
@@ -35,12 +38,19 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.addHandlers()
+        self.socket.connect()
+        //sendReadings()
+        
         motionManager = CMMotionManager()
         motionManager.startAccelerometerUpdates()
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
 
-        _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("sendReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
         _ = NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: Selector("readFromFile"), userInfo: nil, repeats: true)
         
         startTime = NSDate()
@@ -53,6 +63,19 @@ class ViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func addHandlers() {
+        // Our socket handlers go here
+        self.socket.onAny {print("Got event: \($0.event), with items: \($0.items)")}
+
+    }
+    
+    func sendReadings(){
+        self.socket.emit("accel", self.xa, self.ya, self.za)
+        self.socket.emit("gyro", self.xr, self.yr, self.zr)
+        self.socket.emit("mag", self.xm, self.ym, self.zm)
+        
     }
     
     func getReadings(){
@@ -93,9 +116,13 @@ class ViewController: UIViewController {
                 self.zml.text = String(format: "%.2f", self.zm)
 
                 self.time.text = String(self.elapsedTime)
-                self.writeToFile("X_accel.asc")
             }
         }
+
+    }
+    
+    func writeReadings(){
+        self.writeToFile("X_accel.asc")
 
     }
     
@@ -123,8 +150,8 @@ class ViewController: UIViewController {
             
             do {
                 let read = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding)
-                print(read)
-                print("Done")
+              //  print(read)
+              //  print("Done")
             }
             catch {print("Read from file failed")}
             

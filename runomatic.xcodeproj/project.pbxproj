@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		59DBB5EF9D5126B7E831879B /* Pods_runomatic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A822E33AA6CF5FA061A750 /* Pods_runomatic.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A96345DB1C5FF0A200817217 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345DA1C5FF0A200817217 /* AppDelegate.swift */; };
 		A96345DD1C5FF0A200817217 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345DC1C5FF0A200817217 /* ViewController.swift */; };
 		A96345E01C5FF0A200817217 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A96345DE1C5FF0A200817217 /* Main.storyboard */; };
@@ -14,6 +15,7 @@
 		A96345E51C5FF0A200817217 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A96345E31C5FF0A200817217 /* LaunchScreen.storyboard */; };
 		A96345F01C5FF0A200817217 /* runomaticTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345EF1C5FF0A200817217 /* runomaticTests.swift */; };
 		A96345FB1C5FF0A200817217 /* runomaticUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345FA1C5FF0A200817217 /* runomaticUITests.swift */; };
+		A98D7F161C681DEF00009A99 /* SocketIOClientSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A98D7F151C681DEF00009A99 /* SocketIOClientSwift.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +36,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1CEE83F545E6E97E98FCF6CE /* Pods-runomatic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-runomatic.release.xcconfig"; path = "Pods/Target Support Files/Pods-runomatic/Pods-runomatic.release.xcconfig"; sourceTree = "<group>"; };
+		28A822E33AA6CF5FA061A750 /* Pods_runomatic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_runomatic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		418D49C6E4D3AC9B7081D486 /* Pods-runomatic.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-runomatic.debug.xcconfig"; path = "Pods/Target Support Files/Pods-runomatic/Pods-runomatic.debug.xcconfig"; sourceTree = "<group>"; };
 		A96345D71C5FF0A200817217 /* runomatic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = runomatic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96345DA1C5FF0A200817217 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A96345DC1C5FF0A200817217 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -47,6 +52,7 @@
 		A96345F61C5FF0A200817217 /* runomaticUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = runomaticUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96345FA1C5FF0A200817217 /* runomaticUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = runomaticUITests.swift; sourceTree = "<group>"; };
 		A96345FC1C5FF0A200817217 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A98D7F151C681DEF00009A99 /* SocketIOClientSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketIOClientSwift.framework; path = "Pods/../build/Debug-iphoneos/SocketIOClientSwift.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +60,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98D7F161C681DEF00009A99 /* SocketIOClientSwift.framework in Frameworks */,
+				59DBB5EF9D5126B7E831879B /* Pods_runomatic.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +82,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8E6E2DA597171F6234DAA88C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A98D7F151C681DEF00009A99 /* SocketIOClientSwift.framework */,
+				28A822E33AA6CF5FA061A750 /* Pods_runomatic.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A96345CE1C5FF0A200817217 = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +98,8 @@
 				A96345EE1C5FF0A200817217 /* runomaticTests */,
 				A96345F91C5FF0A200817217 /* runomaticUITests */,
 				A96345D81C5FF0A200817217 /* Products */,
+				D2FB6AEFE70BAFEF09404341 /* Pods */,
+				8E6E2DA597171F6234DAA88C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,6 +144,15 @@
 			path = runomaticUITests;
 			sourceTree = "<group>";
 		};
+		D2FB6AEFE70BAFEF09404341 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				418D49C6E4D3AC9B7081D486 /* Pods-runomatic.debug.xcconfig */,
+				1CEE83F545E6E97E98FCF6CE /* Pods-runomatic.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,9 +160,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A96345FF1C5FF0A200817217 /* Build configuration list for PBXNativeTarget "runomatic" */;
 			buildPhases = (
+				DC268C4F778A925090B26D1D /* Check Pods Manifest.lock */,
 				A96345D31C5FF0A200817217 /* Sources */,
 				A96345D41C5FF0A200817217 /* Frameworks */,
 				A96345D51C5FF0A200817217 /* Resources */,
+				CC64C21A2AA22D03C119B2A4 /* Embed Pods Frameworks */,
+				2685C74486B6FFB963DB44AE /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -253,6 +284,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2685C74486B6FFB963DB44AE /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-runomatic/Pods-runomatic-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CC64C21A2AA22D03C119B2A4 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-runomatic/Pods-runomatic-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DC268C4F778A925090B26D1D /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A96345D31C5FF0A200817217 /* Sources */ = {
@@ -398,8 +477,13 @@
 		};
 		A96346001C5FF0A200817217 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 418D49C6E4D3AC9B7081D486 /* Pods-runomatic.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = runomatic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.runomaticinc.runomatic;
@@ -409,8 +493,13 @@
 		};
 		A96346011C5FF0A200817217 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1CEE83F545E6E97E98FCF6CE /* Pods-runomatic.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				INFOPLIST_FILE = runomatic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.runomaticinc.runomatic;
@@ -485,6 +574,7 @@
 				A96346011C5FF0A200817217 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A96346021C5FF0A200817217 /* Build configuration list for PBXNativeTarget "runomaticTests" */ = {
 			isa = XCConfigurationList;
@@ -493,6 +583,7 @@
 				A96346041C5FF0A200817217 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A96346051C5FF0A200817217 /* Build configuration list for PBXNativeTarget "runomaticUITests" */ = {
 			isa = XCConfigurationList;
@@ -501,6 +592,7 @@
 				A96346071C5FF0A200817217 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
