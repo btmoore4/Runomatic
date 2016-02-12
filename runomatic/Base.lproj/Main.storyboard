@@ -138,10 +138,19 @@
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dHe-6h-6bn">
+                                <rect key="frame" x="40" y="371" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="sendEmail:" destination="BYZ-38-t0r" eventType="touchUpInside" id="98d-gM-fLa"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
+                    <navigationItem key="navigationItem" id="eyt-DV-bO8"/>
                     <connections>
+                        <outlet property="Button" destination="dHe-6h-6bn" id="k0h-rt-g13"/>
                         <outlet property="time" destination="t7I-Nr-1HF" id="C6r-dk-JSl"/>
                         <outlet property="xal" destination="iiC-qS-jmb" id="JIl-Yb-Uvk"/>
                         <outlet property="xml" destination="pML-aU-Gkr" id="eLb-pp-rCX"/>
