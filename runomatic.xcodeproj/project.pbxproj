@@ -16,6 +16,8 @@
 		A96345F01C5FF0A200817217 /* runomaticTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345EF1C5FF0A200817217 /* runomaticTests.swift */; };
 		A96345FB1C5FF0A200817217 /* runomaticUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345FA1C5FF0A200817217 /* runomaticUITests.swift */; };
 		A98D7F161C681DEF00009A99 /* SocketIOClientSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A98D7F151C681DEF00009A99 /* SocketIOClientSwift.framework */; };
+		A9922A141C6E579400CC1BC8 /* GPUImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9922A0F1C6E577000CC1BC8 /* GPUImage.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		A9922A161C6E5F3400CC1BC8 /* GPUImage.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = A9922A0F1C6E577000CC1BC8 /* GPUImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +35,41 @@
 			remoteGlobalIDString = A96345D61C5FF0A200817217;
 			remoteInfo = runomatic;
 		};
+		A9922A0C1C6E577000CC1BC8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9922A061C6E577000CC1BC8 /* GPUImage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BCF1A33414DDB1EC00852800;
+			remoteInfo = GPUImage;
+		};
+		A9922A0E1C6E577000CC1BC8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9922A061C6E577000CC1BC8 /* GPUImage.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BCE209E51943F20C002FEED8;
+			remoteInfo = GPUImageFramework;
+		};
+		A9922A121C6E578E00CC1BC8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9922A061C6E577000CC1BC8 /* GPUImage.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = BCE209E41943F20C002FEED8;
+			remoteInfo = GPUImageFramework;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A9922A151C6E5F1000CC1BC8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A9922A161C6E5F3400CC1BC8 /* GPUImage.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1CEE83F545E6E97E98FCF6CE /* Pods-runomatic.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-runomatic.release.xcconfig"; path = "Pods/Target Support Files/Pods-runomatic/Pods-runomatic.release.xcconfig"; sourceTree = "<group>"; };
@@ -53,6 +89,7 @@
 		A96345FA1C5FF0A200817217 /* runomaticUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = runomaticUITests.swift; sourceTree = "<group>"; };
 		A96345FC1C5FF0A200817217 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A98D7F151C681DEF00009A99 /* SocketIOClientSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SocketIOClientSwift.framework; path = "Pods/../build/Debug-iphoneos/SocketIOClientSwift.framework"; sourceTree = "<group>"; };
+		A9922A061C6E577000CC1BC8 /* GPUImage.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GPUImage.xcodeproj; path = GPUImage/GPUImage.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +97,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9922A141C6E579400CC1BC8 /* GPUImage.framework in Frameworks */,
 				A98D7F161C681DEF00009A99 /* SocketIOClientSwift.framework in Frameworks */,
 				59DBB5EF9D5126B7E831879B /* Pods_runomatic.framework in Frameworks */,
 			);
@@ -85,6 +123,7 @@
 		8E6E2DA597171F6234DAA88C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A9922A061C6E577000CC1BC8 /* GPUImage.xcodeproj */,
 				A98D7F151C681DEF00009A99 /* SocketIOClientSwift.framework */,
 				28A822E33AA6CF5FA061A750 /* Pods_runomatic.framework */,
 			);
@@ -144,6 +183,15 @@
 			path = runomaticUITests;
 			sourceTree = "<group>";
 		};
+		A9922A071C6E577000CC1BC8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A9922A0D1C6E577000CC1BC8 /* libGPUImage.a */,
+				A9922A0F1C6E577000CC1BC8 /* GPUImage.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		D2FB6AEFE70BAFEF09404341 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -166,10 +214,12 @@
 				A96345D51C5FF0A200817217 /* Resources */,
 				CC64C21A2AA22D03C119B2A4 /* Embed Pods Frameworks */,
 				2685C74486B6FFB963DB44AE /* Copy Pods Resources */,
+				A9922A151C6E5F1000CC1BC8 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A9922A131C6E578E00CC1BC8 /* PBXTargetDependency */,
 			);
 			name = runomatic;
 			productName = runomatic;
@@ -249,6 +299,12 @@
 			mainGroup = A96345CE1C5FF0A200817217;
 			productRefGroup = A96345D81C5FF0A200817217 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = A9922A071C6E577000CC1BC8 /* Products */;
+					ProjectRef = A9922A061C6E577000CC1BC8 /* GPUImage.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				A96345D61C5FF0A200817217 /* runomatic */,
@@ -257,6 +313,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		A9922A0D1C6E577000CC1BC8 /* libGPUImage.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGPUImage.a;
+			remoteRef = A9922A0C1C6E577000CC1BC8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A9922A0F1C6E577000CC1BC8 /* GPUImage.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GPUImage.framework;
+			remoteRef = A9922A0E1C6E577000CC1BC8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A96345D51C5FF0A200817217 /* Resources */ = {
@@ -372,6 +445,11 @@
 			target = A96345D61C5FF0A200817217 /* runomatic */;
 			targetProxy = A96345F71C5FF0A200817217 /* PBXContainerItemProxy */;
 		};
+		A9922A131C6E578E00CC1BC8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = GPUImageFramework;
+			targetProxy = A9922A121C6E578E00CC1BC8 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -480,12 +558,18 @@
 			baseConfigurationReference = 418D49C6E4D3AC9B7081D486 /* Pods-runomatic.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = runomatic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"SocketIOClientSwift\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.runomaticinc.runomatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -496,12 +580,18 @@
 			baseConfigurationReference = 1CEE83F545E6E97E98FCF6CE /* Pods-runomatic.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/build/Debug-iphoneos",
 				);
 				INFOPLIST_FILE = runomatic/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"SocketIOClientSwift\"",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.runomaticinc.runomatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
