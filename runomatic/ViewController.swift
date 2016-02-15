@@ -38,6 +38,9 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     @IBOutlet var yml:UILabel!
     @IBOutlet var zml:UILabel!
     @IBOutlet var luml:UILabel!
+    @IBOutlet var stepl:UILabel!
+    @IBOutlet var activity:UILabel!
+    @IBOutlet var altl:UILabel!
     @IBOutlet var Button: UIButton!
     
     var startTime:NSDate = NSDate()
@@ -46,10 +49,33 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     var xr:Double = 0,yr:Double = 0,zr:Double = 0
     var xm:Double = 0,ym:Double = 0,zm:Double = 0
     var lum:Double = 0
+    var alt:Double = 0
     
     var pathX:String = "";
     var mess:String = "";
     var start:Bool = false;
+    enum State {
+        case idle, walking, running, jumping, stairs
+    }
+    var state:State = State.idle
+    let Xn = 0, Yn = 0, Zn = -9.81
+    var steps = 0
+    let idleTol = 1.0
+    let walkTol = 1.0
+    let runTol = 3.0
+    let jumpTol = 9.0
+    
+    let timeout = -1.5
+    
+    let stepTol = 1.0
+    enum GraphState {
+        case above, below, zero
+    }
+    var Zstate:GraphState = GraphState.above
+    var ZCrossings = [NSDate]()
+    var lastStep = NSDate()
+    
+    
 
 
     
@@ -76,9 +102,10 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         motionManager.startAccelerometerUpdates()
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
-        
+
+
         _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
-        _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
 
         
         /*
@@ -123,6 +150,73 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         
     }
     
+    func decider(){
+        switch state {
+        case .idle:
+            if (za > Zn + walkTol){
+                state = .walking
+                lastStep = NSDate()
+            }
+            break
+        case .walking:
+            if (za < Zn + idleTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .idle
+                }
+            }else if(za > Zn + runTol){
+                state = .running
+            }else{
+                lastStep = NSDate()
+            }
+            break
+        case .running:
+            if (za < Zn + idleTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .idle
+                }
+            }else if(za < Zn + runTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .walking
+                }
+            }else if(za > Zn + jumpTol){
+                state = .jumping
+            }else{
+                lastStep = NSDate()
+            }
+            break
+        case .jumping:
+            if (za < Zn + idleTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .idle
+                }
+            }else if(za < Zn + jumpTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .running
+                }
+            }else if(za < Zn + runTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .walking
+                }
+            }else{
+                lastStep = NSDate()
+            }
+            break
+        case .stairs: break
+        default: break
+        }
+    }
+    
+    func countSteps(){
+        if ((Zstate == .above) && (za < (Zn - stepTol))){
+            Zstate = .below
+        }
+        if ((Zstate == .below) && (za > (Zn + stepTol))){
+            Zstate = .above
+            steps++
+        }
+        
+    }
+    
     func sendReadings(){
         self.socket.emit("accel", self.xa, self.ya, self.za)
         self.socket.emit("gyro", self.xr, self.yr, self.zr)
@@ -131,7 +225,6 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     }
     
     func getReadings(){
-        
         let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
         dispatch_async(dispatch_get_global_queue(priority, 0)) {
             if let accelerometerData = motionManager.accelerometerData {
@@ -139,7 +232,8 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 self.ya = accelerometerData.acceleration.y * self.accel_scale
                 self.za = accelerometerData.acceleration.z * self.accel_scale
                 self.elapsedTime = NSDate().timeIntervalSinceDate(self.startTime)
-                
+                self.countSteps()
+                self.decider()
             }
             if let gyroData = motionManager.gyroData {
                 self.xr = gyroData.rotationRate.x*180/self.pi
@@ -170,6 +264,10 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 self.time.text = String(self.elapsedTime)
                 
                 self.luml.text = String(self.lum)
+                
+                self.stepl.text = String(self.steps)
+                self.activity.text = String(self.state)
+                self.altl.text = String(self.alt)
             }
         }
         

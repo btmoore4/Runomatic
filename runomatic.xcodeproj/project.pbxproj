@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		59DBB5EF9D5126B7E831879B /* Pods_runomatic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A822E33AA6CF5FA061A750 /* Pods_runomatic.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		59DBB5EF9D5126B7E831879B /* Pods_runomatic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A822E33AA6CF5FA061A750 /* Pods_runomatic.framework */; };
 		A96345DB1C5FF0A200817217 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345DA1C5FF0A200817217 /* AppDelegate.swift */; };
 		A96345DD1C5FF0A200817217 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96345DC1C5FF0A200817217 /* ViewController.swift */; };
 		A96345E01C5FF0A200817217 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A96345DE1C5FF0A200817217 /* Main.storyboard */; };
@@ -274,7 +274,7 @@
 				TargetAttributes = {
 					A96345D61C5FF0A200817217 = {
 						CreatedOnToolsVersion = 7.2;
-						DevelopmentTeam = 6T66YGC736;
+						DevelopmentTeam = D6UAGPZQYN;
 					};
 					A96345EA1C5FF0A200817217 = {
 						CreatedOnToolsVersion = 7.2;
@@ -558,6 +558,8 @@
 			baseConfigurationReference = 418D49C6E4D3AC9B7081D486 /* Pods-runomatic.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -572,6 +574,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.runomaticinc.runomatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -580,6 +583,8 @@
 			baseConfigurationReference = 1CEE83F545E6E97E98FCF6CE /* Pods-runomatic.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -594,6 +599,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.runomaticinc.runomatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
