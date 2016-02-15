@@ -23,10 +23,10 @@ class ViewController: UIViewController {
     let captureSession = AVCaptureSession()
     var captureDevice : AVCaptureDevice?
     var stillImageOutput : AVCaptureStillImageOutput? = AVCaptureStillImageOutput()
-
+    
     var gpuImgCamera:GPUImageVideoCamera = GPUImageVideoCamera(sessionPreset: AVCaptureSessionPreset640x480, cameraPosition: AVCaptureDevicePosition.Front)
     var gpuImgLumFilter:GPUImageLuminosity = GPUImageLuminosity()
-
+    
     @IBOutlet var time:UILabel!
     @IBOutlet var xal:UILabel!
     @IBOutlet var yal:UILabel!
@@ -38,7 +38,7 @@ class ViewController: UIViewController {
     @IBOutlet var yml:UILabel!
     @IBOutlet var zml:UILabel!
     @IBOutlet var luml:UILabel!
-
+    
     
     var img:UIImage = UIImage()
     
@@ -49,7 +49,7 @@ class ViewController: UIViewController {
     var xr:Double = 0,yr:Double = 0,zr:Double = 0
     var xm:Double = 0,ym:Double = 0,zm:Double = 0
     var lum:Double = 0
-
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,35 +57,11 @@ class ViewController: UIViewController {
         self.addHandlers()
         //self.socket.connect()
         //sendReadings()
-        /*
-
-        let devices = AVCaptureDevice.devices()
-
-        // Loop through all the capture devices on this phone
-        for device in devices {
-            // Make sure this particular device supports video
-            if (device.hasMediaType(AVMediaTypeVideo)) {
-                // Finally check the position and confirm we've got the back camera
-                if(device.position == AVCaptureDevicePosition.Front) {
-                    captureDevice = device as? AVCaptureDevice
-                }
-            }
-        }
-        
-        stillImageOutput!.outputSettings = [AVVideoCodecKey : AVVideoCodecJPEG]
-        
-        if captureDevice != nil {
-            configureDevice()
-            beginSession()
-        }
-        */
         
         if gpuImgCamera.inputCamera != nil {
         }
         configureDevice()
-
-
-       
+        
         gpuImgCamera.startCameraCapture()
         gpuImgCamera.addTarget(gpuImgLumFilter)
         gpuImgLumFilter.luminosityProcessingFinishedBlock = {
@@ -95,48 +71,31 @@ class ViewController: UIViewController {
         }
         
         print("exposure duration",  gpuImgCamera.inputCamera.exposureDuration, " ISO: ", gpuImgCamera.inputCamera.ISO)
-
+        
         motionManager = CMMotionManager()
         motionManager.startAccelerometerUpdates()
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
-
+        
         _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
-/*
+        /*
         _ = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("sendReadings"), userInfo: nil, repeats: true)
         _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
         _ = NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: Selector("readFromFile"), userInfo: nil, repeats: true)
-*/
-       // _ = NSTimer.scheduledTimerWithTimeInterval(0.016666667, target: self, selector: Selector("captureImage"), userInfo: nil, repeats: true)
+        */
+        // _ = NSTimer.scheduledTimerWithTimeInterval(0.016666667, target: self, selector: Selector("captureImage"), userInfo: nil, repeats: true)
         
         startTime = NSDate()
         time.text = "hi ben"
         self.xal.text = "x"
         self.yal.text = "y"
-        self.zal.text = "z"
-        
-        
-        
-        
+        self.zal.text = "z"        
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    func beginSession() {
-
-        do{
-            try captureSession.addInput(AVCaptureDeviceInput(device: captureDevice))
-        }
-        catch {
-            print("error capturing video")
-        }
-        captureSession.sessionPreset = AVCaptureSessionPreset640x480
-        captureSession.startRunning()
-        captureSession.addOutput(stillImageOutput)
     }
     
     func configureDevice() {
@@ -155,30 +114,10 @@ class ViewController: UIViewController {
         
     }
     
-    func captureImage(){
-        if let stillOutput = self.stillImageOutput {
-            // we do this on another thread so that we don't hang the UI
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                //find the video connection
-                if let videoConnection = stillOutput.connectionWithMediaType(AVMediaTypeVideo){
-                    //take a photo here
-                    stillOutput.captureStillImageAsynchronouslyFromConnection(videoConnection){
-                        (imageSampleBuffer : CMSampleBuffer!, _) in
-                        if(imageSampleBuffer != nil){
-                            let imageDataJpeg = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageSampleBuffer)
-                            self.img = UIImage(data: imageDataJpeg)!
-                        }
-                    }
-                    //self.captureSession.stopRunning()
-                }
-            }
-        }
-    }
-    
     func addHandlers() {
         // Our socket handlers go here
         self.socket.onAny {print("Got event: \($0.event), with items: \($0.items)")}
-
+        
     }
     
     func sendReadings(){
@@ -197,7 +136,7 @@ class ViewController: UIViewController {
                 self.ya = accelerometerData.acceleration.y * self.accel_scale
                 self.za = accelerometerData.acceleration.z * self.accel_scale
                 self.elapsedTime = NSDate().timeIntervalSinceDate(self.startTime)
-
+                
             }
             if let gyroData = motionManager.gyroData {
                 self.xr = gyroData.rotationRate.x*180/self.pi
@@ -224,18 +163,18 @@ class ViewController: UIViewController {
                 self.xml.text = String(format: "%.2f", self.xm)
                 self.yml.text = String(format: "%.2f", self.ym)
                 self.zml.text = String(format: "%.2f", self.zm)
-
+                
                 self.time.text = String(self.elapsedTime)
                 
                 self.luml.text = String(self.lum)
             }
         }
-
+        
     }
     
     func writeReadings(){
         self.writeToFile("X_accel.asc")
-
+        
     }
     
     func writeToFile(file: String){
@@ -252,7 +191,7 @@ class ViewController: UIViewController {
             }
             
         }
-            
+        
     }
     
     func readFromFile(){
@@ -262,8 +201,8 @@ class ViewController: UIViewController {
             
             do {
                 let read = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding)
-              //  print(read)
-              //  print("Done")
+                //  print(read)
+                //  print("Done")
             }
             catch {print("Read from file failed")}
             
@@ -271,6 +210,6 @@ class ViewController: UIViewController {
         
     }
     
-
+    
 }
 
