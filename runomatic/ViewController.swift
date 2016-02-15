@@ -11,11 +11,11 @@ import CoreMotion
 import AVFoundation
 import GPUImage
 import SocketIOClientSwift
-
+import MessageUI
 var motionManager: CMMotionManager!
 
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     let pi = M_PI
     let accel_scale = 9.81
     let socket = SocketIOClient(socketURL: NSURL(string: "http://192.168.0.113:3000")!, options: ["log": true])
@@ -26,7 +26,7 @@ class ViewController: UIViewController {
     
     var gpuImgCamera:GPUImageVideoCamera = GPUImageVideoCamera(sessionPreset: AVCaptureSessionPreset640x480, cameraPosition: AVCaptureDevicePosition.Front)
     var gpuImgLumFilter:GPUImageLuminosity = GPUImageLuminosity()
-    
+
     @IBOutlet var time:UILabel!
     @IBOutlet var xal:UILabel!
     @IBOutlet var yal:UILabel!
@@ -38,10 +38,7 @@ class ViewController: UIViewController {
     @IBOutlet var yml:UILabel!
     @IBOutlet var zml:UILabel!
     @IBOutlet var luml:UILabel!
-    
-    
-    var img:UIImage = UIImage()
-    
+    @IBOutlet var Button: UIButton!
     
     var startTime:NSDate = NSDate()
     var elapsedTime:NSTimeInterval = 0.0
@@ -50,6 +47,11 @@ class ViewController: UIViewController {
     var xm:Double = 0,ym:Double = 0,zm:Double = 0
     var lum:Double = 0
     
+    var pathX:String = "";
+    var mess:String = "";
+    var start:Bool = false;
+
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,8 +60,6 @@ class ViewController: UIViewController {
         //self.socket.connect()
         //sendReadings()
         
-        if gpuImgCamera.inputCamera != nil {
-        }
         configureDevice()
         
         gpuImgCamera.startCameraCapture()
@@ -78,12 +78,15 @@ class ViewController: UIViewController {
         motionManager.startMagnetometerUpdates()
         
         _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
+        _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
+
+        
         /*
         _ = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("sendReadings"), userInfo: nil, repeats: true)
-        _ = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
         _ = NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: Selector("readFromFile"), userInfo: nil, repeats: true)
         */
         // _ = NSTimer.scheduledTimerWithTimeInterval(0.016666667, target: self, selector: Selector("captureImage"), userInfo: nil, repeats: true)
+
         
         startTime = NSDate()
         time.text = "hi ben"
@@ -173,18 +176,20 @@ class ViewController: UIViewController {
     }
     
     func writeReadings(){
-        self.writeToFile("X_accel.asc")
-        
+        if (start){
+            print("writing file")
+            self.writeToFile("./readings.csv")
+        }
     }
     
     func writeToFile(file: String){
-        let text =  self.xal.text! + ", "
-        
+        mess =  self.time.text! + ", " + self.xal.text! + ", " + self.yal.text! + ", " + self.zal.text! + ", " + self.xrl.text! + ", " + self.yrl.text! + ", " + self.zrl.text! + ", " + self.xml.text! + ", " + self.yml.text! + ", " + self.zml.text! + ", " + "\n"
         if let dir : NSString = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true).first {
             let path = dir.stringByAppendingPathComponent(file);
+            pathX = path;
             if let outputStream = NSOutputStream(toFileAtPath: path, append: true) {
                 outputStream.open()
-                outputStream.write(text, maxLength: text.characters.count)
+                outputStream.write(mess, maxLength: mess.characters.count)
                 outputStream.close()
             } else {
                 print("Write to file failed")
@@ -195,21 +200,53 @@ class ViewController: UIViewController {
     }
     
     func readFromFile(){
-        let file = "X_accel.asc"
+        let file = "data.asc"
         if let dir : NSString = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.AllDomainsMask, true).first {
             let path = dir.stringByAppendingPathComponent(file);
             
             do {
                 let read = try NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding)
-                //  print(read)
-                //  print("Done")
             }
             catch {print("Read from file failed")}
-            
         }
-        
     }
+
     
-    
+    @IBAction func sendEmail(sender: UIButton) {
+        if (!start){
+            start = true
+            startTime = NSDate()
+        }else{
+            start = false
+        if( MFMailComposeViewController.canSendMail() ) {
+            print("Able to send")
+            let mailComposer = MFMailComposeViewController()
+            mailComposer.mailComposeDelegate = self
+            mailComposer.setSubject("Booty")
+            mailComposer.setMessageBody("YAY", isHTML: false)
+
+            if let fileData = NSData(contentsOfFile: pathX) {
+                print("File data loaded.")
+                mailComposer.addAttachmentData(fileData, mimeType: "text/csv", fileName: "data.csv")
+            }else{
+                print("File data is NOT loaded.")
+            }
+            let fileManager = NSFileManager.defaultManager()
+            do {
+                try fileManager.removeItemAtPath(pathX)
+                print("Deleted")
+            }
+            catch let error as NSError {
+                print("Ooops")
+            }
+            self.presentViewController(mailComposer, animated: true, completion: nil)
+        }
+        }
+    }
+    func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!) {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+
+
 }
 
