@@ -89,7 +89,7 @@ class ViewController: UIViewController {
         time.text = "hi ben"
         self.xal.text = "x"
         self.yal.text = "y"
-        self.zal.text = "z"        
+        self.zal.text = "z"
         
     }
     
