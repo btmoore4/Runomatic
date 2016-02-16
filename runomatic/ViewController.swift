@@ -62,12 +62,14 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     var steps = 0
     let idleTol = 1.0
     let walkTol = 1.0
-    let runTol = 3.0
-    let jumpTol = 9.0
+    let runTol = 5.5
+    let jumpTol = 10.0
     
-    let timeout = -1.5
+    let timeout = -1.2
+    let timeout2 = -1.5
     
-    let stepTol = 1.0
+    let stepTol = 1.5
+    let stepRunTol = 4.0
     enum GraphState {
         case above, below, zero
     }
@@ -186,15 +188,15 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             break
         case .jumping:
             if (za < Zn + idleTol){
-                if (lastStep.timeIntervalSinceNow < timeout){
+                if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .idle
                 }
             }else if(za < Zn + jumpTol){
-                if (lastStep.timeIntervalSinceNow < timeout){
+                if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .running
                 }
             }else if(za < Zn + runTol){
-                if (lastStep.timeIntervalSinceNow < timeout){
+                if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .walking
                 }
             }else{
@@ -207,6 +209,15 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     }
     
     func countSteps(){
+        if (state == .running){
+            if ((Zstate == .above) && (za < (Zn - stepRunTol))){
+                Zstate = .below
+            }
+            if ((Zstate == .below) && (za > (Zn + stepRunTol))){
+                Zstate = .above
+                steps++
+            }
+        }
         if ((Zstate == .above) && (za < (Zn - stepTol))){
             Zstate = .below
         }
