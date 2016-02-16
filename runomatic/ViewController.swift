@@ -217,13 +217,14 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 Zstate = .above
                 steps++
             }
-        }
+        }else{
         if ((Zstate == .above) && (za < (Zn - stepTol))){
             Zstate = .below
         }
         if ((Zstate == .below) && (za > (Zn + stepTol))){
             Zstate = .above
             steps++
+        }
         }
         
     }
