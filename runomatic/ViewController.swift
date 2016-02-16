@@ -67,6 +67,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     
     let timeout = -1.2
     let timeout2 = -1.5
+    var waitFlag = true
     
     let stepTol = 1.5
     let stepRunTol = 4.0
@@ -157,6 +158,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         case .idle:
             if (za > Zn + walkTol){
                 state = .walking
+                waitFlag = true
                 lastStep = NSDate()
             }
             break
@@ -164,9 +166,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if (za < Zn + idleTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
+                    waitFlag = true
                 }
             }else if(za > Zn + runTol){
                 state = .running
+                waitFlag = true
             }else{
                 lastStep = NSDate()
             }
@@ -175,13 +179,16 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if (za < Zn + idleTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
+                    waitFlag = true
                 }
             }else if(za < Zn + runTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .walking
+                    waitFlag = true
                 }
             }else if(za > Zn + jumpTol){
                 state = .jumping
+                waitFlag = false
             }else{
                 lastStep = NSDate()
             }
@@ -190,14 +197,17 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if (za < Zn + idleTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .idle
+                    waitFlag = true
                 }
             }else if(za < Zn + jumpTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .running
+                    waitFlag = true
                 }
             }else if(za < Zn + runTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .walking
+                    waitFlag = true
                 }
             }else{
                 lastStep = NSDate()
@@ -216,6 +226,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if ((Zstate == .below) && (za > (Zn + stepRunTol))){
                 Zstate = .above
                 steps++
+                waitFlag = false
             }
         }else{
         if ((Zstate == .above) && (za < (Zn - stepTol))){
