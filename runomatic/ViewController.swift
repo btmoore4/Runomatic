@@ -60,19 +60,19 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         case idle, walking, running, jumping, stairs
     }
     var state:State = State.idle
-    let Xn = 0, Yn = 0, Zn = -9.81
+    let Xn = 0.0, Yn = 0.0, Zn = -9.81
     var steps = 0
     var relativeAltitude = 0.0
     let idleTol = 1.0
     let walkTol = 1.0
-    let runTol = 5.5
-    let jumpTol = 10.0
+    let runTol = 6.0
+    let jumpTol = 9.0
+    let stairTol = 2.0
     
     let timeout = -1.2
     let timeout2 = -1.5
-    var waitFlag = true
     
-    let stepTol = 1.5
+    let stepTol = 1.3
     let stepRunTol = 4.0
     enum GraphState {
         case above, below, zero
@@ -81,6 +81,14 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     var ZCrossings = [NSDate]()
     var lastStep = NSDate()
     
+    var paths = [String]()
+    var names = [String]()
+    var times = [NSDate]()
+    var dists = [Double]()
+    var fileNum = 0
+    
+    let runDist = 40.0
+    let walkDist = 20.0
     
 
 
@@ -171,19 +179,41 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         case .idle:
             if (za > Zn + walkTol){
                 state = .walking
-                waitFlag = true
+                steps = 0
                 lastStep = NSDate()
+                paths.append(pathX)
+                names.append("Idle")
+                fileNum++
+                times.append(NSDate())
+                dists.append(0)
             }
             break
         case .walking:
             if (za < Zn + idleTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
-                    waitFlag = true
+                    paths.append(pathX)
+                    names.append("Walking")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(Double(steps)*walkDist)
                 }
             }else if(za > Zn + runTol){
                 state = .running
-                waitFlag = true
+                paths.append(pathX)
+                names.append("Walking")
+                fileNum++
+                times.append(NSDate())
+                dists.append(Double(steps)*walkDist)
+                steps = 1
+            }else if(ya > Yn + stairTol){
+                state = .stairs
+                paths.append(pathX)
+                names.append("Walking")
+                fileNum++
+                times.append(NSDate())
+                dists.append(Double(steps)*walkDist)
+                steps = 1
             }else{
                 lastStep = NSDate()
             }
@@ -192,16 +222,29 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if (za < Zn + idleTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
-                    waitFlag = true
+                    paths.append(pathX)
+                    names.append("Running")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(Double(steps)*runDist)
                 }
             }else if(za < Zn + runTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .walking
-                    waitFlag = true
+                    paths.append(pathX)
+                    names.append("Running")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(Double(steps)*runDist)
+                    steps = 0
                 }
             }else if(za > Zn + jumpTol){
                 state = .jumping
-                waitFlag = false
+                paths.append(pathX)
+                names.append("Running")
+                fileNum++
+                times.append(NSDate())
+                dists.append(Double(steps)*runDist)
             }else{
                 lastStep = NSDate()
             }
@@ -210,23 +253,74 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if (za < Zn + idleTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .idle
-                    waitFlag = true
+                    paths.append(pathX)
+                    names.append("Jumping")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(0)
                 }
             }else if(za < Zn + jumpTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .running
-                    waitFlag = true
+                    steps = 1
+                    paths.append(pathX)
+                    names.append("Jumping")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(0)
                 }
             }else if(za < Zn + runTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .walking
-                    waitFlag = true
+                    steps = 0
+                    paths.append(pathX)
+                    names.append("Jumping")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(0)
                 }
             }else{
                 lastStep = NSDate()
             }
             break
-        case .stairs: break
+        case .stairs:
+            steps = 0
+            if (za < Zn + idleTol){
+                if (lastStep.timeIntervalSinceNow < timeout){
+                    state = .idle
+                    paths.append(pathX)
+                    names.append("Stairs")
+                    fileNum++
+                    times.append(NSDate())
+                    dists.append(Double(steps)*walkDist)
+                }
+            }else if(za > Zn + jumpTol){
+                state = .jumping
+                paths.append(pathX)
+                names.append("Stairs")
+                fileNum++
+                times.append(NSDate())
+                dists.append(Double(steps)*walkDist)
+            }else if(za > Zn + runTol){
+                state = .running
+                paths.append(pathX)
+                names.append("Stairs")
+                fileNum++
+                times.append(NSDate())
+                dists.append(Double(steps)*walkDist)
+                steps = 1
+            }else if(ya < Yn + stairTol){
+                state = .walking
+                paths.append(pathX)
+                names.append("Stairs")
+                fileNum++
+                times.append(NSDate())
+                dists.append(Double(steps)*walkDist)
+                steps = 1
+            }else{
+                lastStep = NSDate()
+            }
+            break
         default: break
         }
     }
@@ -239,7 +333,6 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             if ((Zstate == .below) && (za > (Zn + stepRunTol))){
                 Zstate = .above
                 steps++
-                waitFlag = false
             }
         }else{
         if ((Zstate == .above) && (za < (Zn - stepTol))){
@@ -312,8 +405,15 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     func writeReadings(){
         if (start){
             print("writing file")
-            self.writeToFile("./readings.csv")
+            //self.writeToFile("./readings.csv")
+            self.writeToFile(String(fileNum)+".csv")
         }
+    }
+    
+    func fileNamer(index: Int) -> String{
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "dd-MM-yy HH:mm:ss"
+        return String(format:"%@_%@_%@cm.csv",names[index],formatter.stringFromDate(times[index]),String(dists[index]))
     }
     
     func writeToFile(file: String){
@@ -350,6 +450,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         if (!start){
             start = true
             startTime = NSDate()
+            paths = [String]()
+            names = [String]()
+            times = [NSDate]()
+            dists = [Double]()
+            times.append(NSDate())
         }else{
             start = false
         if( MFMailComposeViewController.canSendMail() ) {
@@ -358,21 +463,25 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             mailComposer.mailComposeDelegate = self
             mailComposer.setSubject("Booty")
             mailComposer.setMessageBody("YAY", isHTML: false)
-
-            if let fileData = NSData(contentsOfFile: pathX) {
-                print("File data loaded.")
-                mailComposer.addAttachmentData(fileData, mimeType: "text/csv", fileName: "data.csv")
-            }else{
-                print("File data is NOT loaded.")
-            }
             let fileManager = NSFileManager.defaultManager()
-            do {
-                try fileManager.removeItemAtPath(pathX)
-                print("Deleted")
+            for var index = 0; index < paths.count; ++index {
+            
+                if let fileData = NSData(contentsOfFile: paths[index]) {
+                    print("File data loaded.")
+                    mailComposer.addAttachmentData(fileData, mimeType: "text/csv", fileName: fileNamer(index))
+                    do {
+                        try fileManager.removeItemAtPath(paths[index])
+                        print("Deleted")
+                    }
+                    catch let error as NSError {
+                        print("Ooops")
+                    }
+                }else{
+                    print("File data is NOT loaded.")
+                }
             }
-            catch let error as NSError {
-                print("Ooops")
-            }
+
+            
             self.presentViewController(mailComposer, animated: true, completion: nil)
         }
         }
