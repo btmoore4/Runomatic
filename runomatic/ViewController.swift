@@ -19,6 +19,8 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     let pi = M_PI
     let accel_scale = 9.81
     let socket = SocketIOClient(socketURL: NSURL(string: "http://192.168.0.113:3000")!, options: ["log": true])
+    let altimeter = CMAltimeter()
+
     
     let captureSession = AVCaptureSession()
     var captureDevice : AVCaptureDevice?
@@ -60,6 +62,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     var state:State = State.idle
     let Xn = 0, Yn = 0, Zn = -9.81
     var steps = 0
+    var relativeAltitude = 0.0
     let idleTol = 1.0
     let walkTol = 1.0
     let runTol = 5.5
@@ -98,7 +101,17 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             self.lum = Double(luminosity)
             
         }
-        
+        // 1
+        if CMAltimeter.isRelativeAltitudeAvailable() {
+            // 2
+            altimeter.startRelativeAltitudeUpdatesToQueue(NSOperationQueue.mainQueue(), withHandler: { data, error in
+                // 3
+
+                    print("Relative Altitude: \(data!.relativeAltitude)")
+                    print("Pressure: \(data!.pressure)")
+                    self.relativeAltitude = Double(data!.relativeAltitude)
+            })
+        }
         print("exposure duration",  gpuImgCamera.inputCamera.exposureDuration, " ISO: ", gpuImgCamera.inputCamera.ISO)
         
         motionManager = CMMotionManager()
@@ -290,7 +303,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 
                 self.stepl.text = String(self.steps)
                 self.activity.text = String(self.state)
-                self.altl.text = String(self.alt)
+                self.altl.text = String(self.relativeAltitude)
             }
         }
         
