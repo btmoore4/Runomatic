@@ -18,9 +18,9 @@ var motionManager: CMMotionManager!
 class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     let pi = M_PI
     let accel_scale = 9.81
-    let socket = SocketIOClient(socketURL: NSURL(string: "http://192.168.0.113:3000")!, options: ["log": true])
+    let socket = SocketIOClient(socketURL: NSURL(string: "http://192.168.2.9:3000")!, options: ["log": true])
     let altimeter = CMAltimeter()
-
+    
     
     let captureSession = AVCaptureSession()
     var captureDevice : AVCaptureDevice?
@@ -28,7 +28,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     
     var gpuImgCamera:GPUImageVideoCamera = GPUImageVideoCamera(sessionPreset: AVCaptureSessionPreset640x480, cameraPosition: AVCaptureDevicePosition.Front)
     var gpuImgLumFilter:GPUImageLuminosity = GPUImageLuminosity()
-
+    
     @IBOutlet var time:UILabel!
     @IBOutlet var xal:UILabel!
     @IBOutlet var yal:UILabel!
@@ -39,6 +39,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     @IBOutlet var xml:UILabel!
     @IBOutlet var yml:UILabel!
     @IBOutlet var zml:UILabel!
+    @IBOutlet var stl:UILabel!
     @IBOutlet var luml:UILabel!
     @IBOutlet var stepl:UILabel!
     @IBOutlet var activity:UILabel!
@@ -63,11 +64,15 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     let Xn = 0.0, Yn = 0.0, Zn = -9.81
     var steps = 0
     var relativeAltitude = 0.0
+    var lastAltitude = 0.0
     let idleTol = 1.0
     let walkTol = 1.0
     let runTol = 6.0
     let jumpTol = 9.0
     let stairTol = 2.0
+    
+    var stairs = false
+    var stairConst = 1.5
     
     let timeout = -1.2
     let timeout2 = -1.5
@@ -90,15 +95,15 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
     let runDist = 40.0
     let walkDist = 20.0
     
-
-
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.addHandlers()
-        //self.socket.connect()
-        //sendReadings()
+        self.socket.connect()
+        sendReadings()
         
         configureDevice()
         
@@ -109,15 +114,17 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             self.lum = Double(luminosity)
             
         }
+        
+        
         // 1
         if CMAltimeter.isRelativeAltitudeAvailable() {
             // 2
             altimeter.startRelativeAltitudeUpdatesToQueue(NSOperationQueue.mainQueue(), withHandler: { data, error in
                 // 3
-
-                    print("Relative Altitude: \(data!.relativeAltitude)")
-                    print("Pressure: \(data!.pressure)")
-                    self.relativeAltitude = Double(data!.relativeAltitude)
+                
+                print("Relative Altitude: \(data!.relativeAltitude)")
+                print("Pressure: \(data!.pressure)")
+                self.relativeAltitude = Double(data!.relativeAltitude)
             })
         }
         print("exposure duration",  gpuImgCamera.inputCamera.exposureDuration, " ISO: ", gpuImgCamera.inputCamera.ISO)
@@ -126,18 +133,18 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         motionManager.startAccelerometerUpdates()
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
-
-
+        
+        
         _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("getReadings"), userInfo: nil, repeats: true)
         _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("writeReadings"), userInfo: nil, repeats: true)
-
         
-        /*
-        _ = NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: Selector("sendReadings"), userInfo: nil, repeats: true)
-        _ = NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: Selector("readFromFile"), userInfo: nil, repeats: true)
+        
+        
+        _ = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("sendReadings"), userInfo: nil, repeats: true)
+        /*        _ = NSTimer.scheduledTimerWithTimeInterval(5.0, target: self, selector: Selector("readFromFile"), userInfo: nil, repeats: true)
         */
-        // _ = NSTimer.scheduledTimerWithTimeInterval(0.016666667, target: self, selector: Selector("captureImage"), userInfo: nil, repeats: true)
-
+        
+        
         
         startTime = NSDate()
         time.text = "hi ben"
@@ -179,10 +186,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
         case .idle:
             if (za > Zn + walkTol){
                 state = .walking
+                lastAltitude = relativeAltitude
                 steps = 0
                 lastStep = NSDate()
                 paths.append(pathX)
-                names.append("Idle")
+                names.append("IDLE")
                 fileNum++
                 times.append(NSDate())
                 dists.append(0)
@@ -193,7 +201,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
                     paths.append(pathX)
-                    names.append("Walking")
+                    if(abs(lastAltitude - relativeAltitude) > stairConst){
+                        names.append("STAIRS")
+                    }else{
+                        names.append("WALKING")
+                    }
                     fileNum++
                     times.append(NSDate())
                     dists.append(Double(steps)*walkDist)
@@ -201,7 +213,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             }else if(za > Zn + runTol){
                 state = .running
                 paths.append(pathX)
-                names.append("Walking")
+                if(abs(lastAltitude - relativeAltitude) > stairConst){
+                    names.append("STAIRS")
+                }else{
+                    names.append("WALKING")
+                }
                 fileNum++
                 times.append(NSDate())
                 dists.append(Double(steps)*walkDist)
@@ -209,7 +225,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             }else if(ya > Yn + stairTol){
                 state = .stairs
                 paths.append(pathX)
-                names.append("Walking")
+                if(abs(lastAltitude - relativeAltitude) > stairConst){
+                    names.append("STAIRS")
+                }else{
+                    names.append("WALKING")
+                }
                 fileNum++
                 times.append(NSDate())
                 dists.append(Double(steps)*walkDist)
@@ -223,7 +243,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
                     paths.append(pathX)
-                    names.append("Running")
+                    names.append("RUNNING")
                     fileNum++
                     times.append(NSDate())
                     dists.append(Double(steps)*runDist)
@@ -231,8 +251,9 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             }else if(za < Zn + runTol){
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .walking
+                    lastAltitude = relativeAltitude
                     paths.append(pathX)
-                    names.append("Running")
+                    names.append("RUNNING")
                     fileNum++
                     times.append(NSDate())
                     dists.append(Double(steps)*runDist)
@@ -241,7 +262,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             }else if(za > Zn + jumpTol){
                 state = .jumping
                 paths.append(pathX)
-                names.append("Running")
+                names.append("RUNNING")
                 fileNum++
                 times.append(NSDate())
                 dists.append(Double(steps)*runDist)
@@ -254,7 +275,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .idle
                     paths.append(pathX)
-                    names.append("Jumping")
+                    names.append("JUMPING")
                     fileNum++
                     times.append(NSDate())
                     dists.append(0)
@@ -264,7 +285,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                     state = .running
                     steps = 1
                     paths.append(pathX)
-                    names.append("Jumping")
+                    names.append("JUMPING")
                     fileNum++
                     times.append(NSDate())
                     dists.append(0)
@@ -272,9 +293,10 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             }else if(za < Zn + runTol){
                 if (lastStep.timeIntervalSinceNow < timeout2){
                     state = .walking
+                    lastAltitude = relativeAltitude
                     steps = 0
                     paths.append(pathX)
-                    names.append("Jumping")
+                    names.append("JUMPING")
                     fileNum++
                     times.append(NSDate())
                     dists.append(0)
@@ -289,7 +311,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 if (lastStep.timeIntervalSinceNow < timeout){
                     state = .idle
                     paths.append(pathX)
-                    names.append("Stairs")
+                    names.append("STAIRS")
                     fileNum++
                     times.append(NSDate())
                     dists.append(Double(steps)*walkDist)
@@ -297,22 +319,23 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             }else if(za > Zn + jumpTol){
                 state = .jumping
                 paths.append(pathX)
-                names.append("Stairs")
+                names.append("STAIRS")
                 fileNum++
                 times.append(NSDate())
                 dists.append(Double(steps)*walkDist)
             }else if(za > Zn + runTol){
                 state = .running
                 paths.append(pathX)
-                names.append("Stairs")
+                names.append("STAIRS")
                 fileNum++
                 times.append(NSDate())
                 dists.append(Double(steps)*walkDist)
                 steps = 1
             }else if(ya < Yn + stairTol){
                 state = .walking
+                lastAltitude = relativeAltitude
                 paths.append(pathX)
-                names.append("Stairs")
+                names.append("STAIRS")
                 fileNum++
                 times.append(NSDate())
                 dists.append(Double(steps)*walkDist)
@@ -335,13 +358,13 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 steps++
             }
         }else{
-        if ((Zstate == .above) && (za < (Zn - stepTol))){
-            Zstate = .below
-        }
-        if ((Zstate == .below) && (za > (Zn + stepTol))){
-            Zstate = .above
-            steps++
-        }
+            if ((Zstate == .above) && (za < (Zn - stepTol))){
+                Zstate = .below
+            }
+            if ((Zstate == .below) && (za > (Zn + stepTol))){
+                Zstate = .above
+                steps++
+            }
         }
         
     }
@@ -397,6 +420,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
                 self.stepl.text = String(self.steps)
                 self.activity.text = String(self.state)
                 self.altl.text = String(self.relativeAltitude)
+                
             }
         }
         
@@ -444,7 +468,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             catch {print("Read from file failed")}
         }
     }
-
+    
     
     @IBAction func sendEmail(sender: UIButton) {
         if (!start){
@@ -457,39 +481,39 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate{
             times.append(NSDate())
         }else{
             start = false
-        if( MFMailComposeViewController.canSendMail() ) {
-            print("Able to send")
-            let mailComposer = MFMailComposeViewController()
-            mailComposer.mailComposeDelegate = self
-            mailComposer.setSubject("Booty")
-            mailComposer.setMessageBody("YAY", isHTML: false)
-            let fileManager = NSFileManager.defaultManager()
-            for var index = 0; index < paths.count; ++index {
-            
-                if let fileData = NSData(contentsOfFile: paths[index]) {
-                    print("File data loaded.")
-                    mailComposer.addAttachmentData(fileData, mimeType: "text/csv", fileName: fileNamer(index))
-                    do {
-                        try fileManager.removeItemAtPath(paths[index])
-                        print("Deleted")
+            if( MFMailComposeViewController.canSendMail() ) {
+                print("Able to send")
+                let mailComposer = MFMailComposeViewController()
+                mailComposer.mailComposeDelegate = self
+                mailComposer.setSubject("Booty")
+                mailComposer.setMessageBody("YAY", isHTML: false)
+                let fileManager = NSFileManager.defaultManager()
+                for var index = 0; index < paths.count; ++index {
+                    
+                    if let fileData = NSData(contentsOfFile: paths[index]) {
+                        print("File data loaded.")
+                        mailComposer.addAttachmentData(fileData, mimeType: "text/csv", fileName: fileNamer(index))
+                        do {
+                            try fileManager.removeItemAtPath(paths[index])
+                            print("Deleted")
+                        }
+                        catch let error as NSError {
+                            print("Ooops")
+                        }
+                    }else{
+                        print("File data is NOT loaded.")
                     }
-                    catch let error as NSError {
-                        print("Ooops")
-                    }
-                }else{
-                    print("File data is NOT loaded.")
                 }
+                
+                
+                self.presentViewController(mailComposer, animated: true, completion: nil)
             }
-
-            
-            self.presentViewController(mailComposer, animated: true, completion: nil)
-        }
         }
     }
     func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!) {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
-
-
+    
+    
 }
 
